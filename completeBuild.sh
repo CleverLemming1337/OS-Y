@@ -25,7 +25,7 @@ else
 fi
 
 echo "Step 4 of 5: Verifiying multiboot"
-if ./verfifyMultiboot.sh; then
+if ./verifyMultiboot.sh; then
     echo -e "\033[32mSuccess\033[0m"
 else
     echo -e "\033[31mFailure\033[0m"
