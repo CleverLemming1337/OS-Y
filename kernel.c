@@ -10,6 +10,7 @@ efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
   InitializeLib(ImageHandle, SystemTable);
   Print(L"Hello, world!\n");
   Print(LVERSION);
-  while(1);
+  EFI_INPUT_KEY Key;
+  while (SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &Key) == EFI_NOT_READY);
   return EFI_SUCCESS;
 }

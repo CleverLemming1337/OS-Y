@@ -2,5 +2,5 @@ isodir/
 *.o
 *.bin
 *.isodir
-*.efi
+main.efi
 *.so
