@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Step 4: Signing EFI"
+
 sudo apt install sbsigntool
 
-sbsign --key privkey.pem --cert cert.pem --output signed.efi main.efi
+mv main.efi unsigned.efi
+sbsign --key privkey.pem --cert cert.pem --output signed.efi unsigned.efi
