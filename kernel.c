@@ -1,19 +1,14 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION "0.1.4"
+#define VERSION "0.1.3"
 
-
-const int CHAR_REPLACEMENTS[] = {'\0', '^A', '^B', '^C', '^D', '^E'};
-
-
-
-char replaceChar(CHAR16 *c) {
-  return CHAR_REPLACEMENTS[*c];
+void echo_cmd(char* str, int n) {
+  for(int i = 0; i<n; str++) {
+    Print(L"%c", *str);
+  }
 }
 
-EFI_STATUS
-EFIAPI
-efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
+EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
 {
   InitializeLib(ImageHandle, SystemTable);
   EFI_INPUT_KEY Key;
@@ -25,17 +20,25 @@ efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
   Print(L"\nPress ^C key to exit");
 
   while (1) {
-    // Warte auf Tastatureingabe
-    Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
-    if (Status == EFI_SUCCESS) {
-    
-      // Gebe das Zeichen auf dem Bildschirm aus
-      Print(L"You pressed: %c (Raw: %c, Unicode: %d)\n", replaceChar(&Key.UnicodeChar), Key.UnicodeChar, Key.UnicodeChar);
-
-      if (Key.UnicodeChar == 3) { // ^C pressed
-        break;
+    Print(L"Shell> ");
+    while(Key.UnicodeChar != 33) {
+      
+      Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
+      if (Status == EFI_SUCCESS) {
+        if (Key.UnicodeChar == 9) {
+          Print(L"\t");
+        }
+        else if (Key.UnicodeChar == 33) {
+          Print(L"\n");
+        }
+        else if (Key.UnicodeChar == 3) {
+          Print(L"^C");
+          return EFI_SUCCESS;
+        }
+        Print(L"%c", Key.UnicodeChar);
       }
     }
+    
   }
   
   Print(L"Exit");
