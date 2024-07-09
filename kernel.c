@@ -1,6 +1,7 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION "0.1.3"
+
+const char version[] = "0.1.4";
 
 void echo_cmd(CHAR16* str, int n) {
   for(int i = 0; i < n; str++) {
@@ -16,7 +17,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   int InputIndex = 0;
 
   Print(L"Hello, world!\n");
-  Print(L"Version %s\n", VERSION);
+  Print(L"Version %s\n", version);
   Print(L"Press ^C key to exit\n");
 
   while (1) {
@@ -46,8 +47,24 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       Print(L"\n");
       echo_cmd(InputBuffer + 5, InputIndex - 5);
       Print(L"\n");
-    } else {
-      Print(L"\nBefehl nicht gefunden\n");
+    } else if (StrCmp(InputBuffer, L"exit") == 0) {
+      Print(L"Exiting...\n");
+      break;
+    } else if (StrCmp(InputBuffer, L"sysinfo") == 0) {
+      Print(L"System Information:\n");
+      Print(L"EFI Specification Version: %d.%d\n", EFI_SPECIFICATION_MAJOR_REVISION, EFI_SPECIFICATION_MINOR_REVISION);
+    } else if (StrCmp(InputBuffer, L"time") == 0) {
+      // Get current time (a custom implementation)
+      EFI_TIME currentTime;
+      SystemTable->RuntimeServices->GetTime(&currentTime, NULL);
+
+      Print(L"Current time: %02d:%02d:%02d\n", currentTime.Hour, currentTime.Minute, currentTime.Second);
+    } else if (StrCmp(InputBuffer, L"color a") == 0) {
+      // Set text color to green
+      ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
+    }
+    else {
+      Print(L"\nCommand not found.\n");
     }
   }
 
