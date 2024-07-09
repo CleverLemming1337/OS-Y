@@ -1,7 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION "0.1.2"
-#define LVERSION L"0.1.2\n"
+#define VERSION "0.1.3"
 
 EFI_STATUS
 EFIAPI
@@ -12,7 +11,7 @@ efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
   EFI_STATUS Status;
 
   Print(L"Hello, world!\n");
-  Print(LVERSION);
+  Print(L"Version %s", VERSION);
 
   Print(L"\nPress any key to exit");
 
@@ -21,7 +20,7 @@ efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
         Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
         if (Status == EFI_SUCCESS) {
             // Gebe das Zeichen auf dem Bildschirm aus
-            Print(L"%c", Key.UnicodeChar);
+            Print(L"You pressed: %c (ScanCode: %d)\n", Key.UnicodeChar, Key.ScanCode);
         }
     }
   Print(L"Exit");
