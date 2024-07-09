@@ -9,5 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Install
+      run:  ./install_deps.sh
     - name: Complete Build
       run:  ./0A_complete_build.sh
