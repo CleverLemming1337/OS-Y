@@ -1,0 +1,13 @@
+name: Build EFI
+
+on: [push, pull_request ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Complete Build
+      run:  ./0A_complete_build.sh
