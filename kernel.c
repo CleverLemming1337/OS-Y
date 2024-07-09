@@ -20,7 +20,7 @@ efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
         Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
         if (Status == EFI_SUCCESS) {
             // Gebe das Zeichen auf dem Bildschirm aus
-            Print(L"You pressed: %c (ScanCode: %d)\n", Key.UnicodeChar, Key.ScanCode);
+            Print(L"You pressed: %c (Unicode: %d)\n", Key.UnicodeChar, Key.UnicodeChar);
         }
     }
   Print(L"Exit");
