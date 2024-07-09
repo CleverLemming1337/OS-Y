@@ -4,3 +4,6 @@ isodir/
 *.isodir
 main.efi
 *.so
+*.key
+*.pem
+signed.efi
