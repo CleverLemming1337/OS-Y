@@ -70,6 +70,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(BS->LocateProtocol, 3, &GraphicsOutputProtocol, NULL, (void **)&GraphicsOutput);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to locate Graphics Output Protocol\n");
+      while(1);
       return Status;
   }
 
@@ -77,6 +78,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(BS->LocateProtocol, 3, &FileSystemProtocol, NULL, (void **)&FileSystem);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to locate File System Protocol\n");
+      while(1);
       return Status;
   }
 
@@ -84,13 +86,15 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(FileSystem->OpenVolume, 2, FileSystem, &Root);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to open root volume\n");
+      while(1);
       return Status;
   }
 
   // Öffne die Bilddatei
-  Status = uefi_call_wrapper(Root->Open, 5, Root, &File, L"\\Logo.bmp", EFI_FILE_MODE_READ, 0);
+  Status = uefi_call_wrapper(Root->Open, 5, Root, &File, L"Logo.bmp", EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to open file\n");
+      while(1);
       return Status;
   }
 
@@ -99,6 +103,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(File->GetInfo, 4, File, &GenericFileInfo, &BufferSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
       Print(L"Unable to get file size\n");
+      while(1);
       return Status;
   }
 
@@ -106,6 +111,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(BS->AllocatePool, 3, EfiLoaderData, BufferSize, (void **)&Buffer);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to allocate memory\n");
+      while(1);
       return Status;
   }
 
@@ -113,6 +119,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Status = uefi_call_wrapper(File->Read, 3, File, &BufferSize, Buffer);
   if (EFI_ERROR(Status)) {
       Print(L"Unable to read file\n");
+      while(1);
       return Status;
   }
 
