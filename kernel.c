@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.5"
+#define VERSION L"0.2.0.1"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -55,7 +55,91 @@ void sliceString(CHAR16 *source, CHAR16 *dest, int start, int end) {
 EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   InitializeLib(ImageHandle, SystemTable);
   EFI_INPUT_KEY Key;
+
+
+
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
+  EFI_FILE_IO_INTERFACE *FileSystem;
+  EFI_FILE_HANDLE Root, File;
   EFI_STATUS Status;
+  UINTN BufferSize;
+  VOID *Buffer;
+
+
+  // Hole das Graphics Output Protocol
+  Status = uefi_call_wrapper(BS->LocateProtocol, 3, &GraphicsOutputProtocol, NULL, (void **)&GraphicsOutput);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to locate Graphics Output Protocol\n");
+      return Status;
+  }
+
+  // Hole das Simple File System Protocol
+  Status = uefi_call_wrapper(BS->LocateProtocol, 3, &FileSystemProtocol, NULL, (void **)&FileSystem);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to locate File System Protocol\n");
+      return Status;
+  }
+
+  // Öffne das Root-Verzeichnis
+  Status = uefi_call_wrapper(FileSystem->OpenVolume, 2, FileSystem, &Root);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to open root volume\n");
+      return Status;
+  }
+
+  // Öffne die Bilddatei
+  Status = uefi_call_wrapper(Root->Open, 5, Root, &File, L"\\Logo.bmp", EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to open file\n");
+      return Status;
+  }
+
+  // Bestimme die Größe der Datei
+  BufferSize = 0;
+  Status = uefi_call_wrapper(File->GetInfo, 4, File, &GenericFileInfo, &BufferSize, NULL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+      Print(L"Unable to get file size\n");
+      return Status;
+  }
+
+  // Allokiere Speicher für die Datei
+  Status = uefi_call_wrapper(BS->AllocatePool, 3, EfiLoaderData, BufferSize, (void **)&Buffer);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to allocate memory\n");
+      return Status;
+  }
+
+  // Lese die Datei in den Speicher
+  Status = uefi_call_wrapper(File->Read, 3, File, &BufferSize, Buffer);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to read file\n");
+      return Status;
+  }
+
+  // Schließe die Datei
+  uefi_call_wrapper(File->Close, 1, File);
+
+  // Berechne die Position, um das Bild mittig anzuzeigen
+  UINTN ScreenWidth = GraphicsOutput->Mode->Info->HorizontalResolution;
+  UINTN ScreenHeight = GraphicsOutput->Mode->Info->VerticalResolution;
+  UINTN ImageWidth = 100; // Setze hier die tatsächliche Breite des Bildes ein
+  UINTN ImageHeight = 100; // Setze hier die tatsächliche Höhe des Bildes ein
+  UINTN X = (ScreenWidth - ImageWidth) / 2;
+  UINTN Y = (ScreenHeight - ImageHeight) / 2;
+
+  // Zeige das Bild an (dieser Teil muss an die spezifische Bildverarbeitung angepasst werden)
+  // Hier wird angenommen, dass das Bild im BMP-Format vorliegt und direkt angezeigt werden kann
+  Status = uefi_call_wrapper(GraphicsOutput->Blt, 10, GraphicsOutput, Buffer, EfiBltBufferToVideo, 0, 0, X, Y, ImageWidth, ImageHeight, 0);
+  if (EFI_ERROR(Status)) {
+      Print(L"Unable to display image\n");
+      return Status;
+  }
+
+  // Befreie den Speicher
+  uefi_call_wrapper(BS->FreePool, 1, Buffer);
+
+
+
   CHAR16 InputBuffer[100];
   int InputIndex = 0;
 
