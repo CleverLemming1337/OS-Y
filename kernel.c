@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.2"
+#define VERSION L"0.1.5.3"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -94,12 +94,16 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
     sliceString(InputBuffer, command, 0, cmdLength);
     
+    // Please sort alphabetically!
     if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - cmdLength);
       Print(L"\n");
     } else if (StrCmp(command, L"exit") == 0) {
       Print(L"Exiting...\n");
       break;
+    } else if (StrCmp(command, L"shutdown")==0) {
+      Print(L"Shutting down...\n");
+      SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
     } else if (StrCmp(command, L"sysinfo") == 0) {
       Print(L"System Information:\n");
       Print(L"EFI Specification Version: %d.%d\n", EFI_SPECIFICATION_MAJOR_REVISION, EFI_SPECIFICATION_MINOR_REVISION);
@@ -112,6 +116,14 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"color a") == 0) {
       // Set text color to green
       ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
+    } else if (StrCmp(command, L"help")==0) {
+      // Please sort alphabetically!
+      Print(L"Available commands:\n\n");
+      Print(L"- ECHO:     Output a string.\n");
+      Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
+      Print(L"- SHUTDOWN: Shut down computer.\n");
+      Print(L"- SYSINFO:  Show system information.\n");
+      Print(L"- TIME:     Show current time.\n");
     } else if (StrCmp(InputBuffer, L"") == 0) {
       continue;
     }
