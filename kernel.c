@@ -4,6 +4,14 @@
 const char version[] = "0.1.4";
 
 void echo_cmd(CHAR16* str, int n) {
+  /*
+  Executes the ECHO command.
+
+  Args:
+
+  * str: CHAR16*: The string to print (pointer to start address)
+  * n: int:       The length of the string
+  */
   for(int i = 0; i < n; str++) {
     Print(L"%c", *str);
   }
