@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.3"
+#define VERSION L"0.1.5.4"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -65,9 +65,10 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Print(L"Hello, world!\n");
   Print(L"Version: ");
   Print(VERSION);
-  Print(L"\n\nPress ^C key to exit\n");
+  Print(L"\n\nEnter \"exit\" to exit or \"help\" for help.\n");
 
   while (1) {
+    ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
     Print(L"Shell> ");
     InputIndex = 0;
 
@@ -101,7 +102,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"exit") == 0) {
       Print(L"Exiting...\n");
       break;
-    } else if (StrCmp(command, L"shutdown")==0) {
+    } else if (StrCmp(command, L"reboot")==0) {
       Print(L"Shutting down...\n");
       SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
     } else if (StrCmp(command, L"sysinfo") == 0) {
@@ -121,7 +122,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       Print(L"Available commands:\n\n");
       Print(L"- ECHO:     Output a string.\n");
       Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
-      Print(L"- SHUTDOWN: Shut down computer.\n");
+      Print(L"- REBOOT: Shut down computer.\n");
       Print(L"- SYSINFO:  Show system information.\n");
       Print(L"- TIME:     Show current time.\n");
     } else if (StrCmp(InputBuffer, L"") == 0) {
