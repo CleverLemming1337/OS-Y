@@ -7,3 +7,4 @@ main.efi
 *.key
 *.pem
 signed.efi
+*.DS_Store
