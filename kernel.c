@@ -88,7 +88,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     Print(L"\n");
 
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
-    sliceString(InputBuffer, command, 0, 5);
+    sliceString(InputBuffer, command, 0, cmdLength);
     Print(L"Command: %s.\n", command);
     if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - 5);
@@ -109,7 +109,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       // Set text color to green
       ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
     } else if (StrCmp(InputBuffer, L"") == 0) {
-      break;
+      continue;
     }
     else {
       Print(L"\nCommand not found.\n");
