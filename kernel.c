@@ -1,7 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-
-const char version[] = "0.1.4";
+#define VERSION L"0.1.5"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -60,8 +59,9 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   CHAR16 command[64];
 
   Print(L"Hello, world!\n");
-  Print(L"Version %s\n", version);
-  Print(L"Press ^C key to exit\n");
+  Print(L"Version");
+  Print(VERSION);
+  Print(L"\n\nPress ^C key to exit\n");
 
   while (1) {
     Print(L"Shell> ");
@@ -89,7 +89,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
 
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
     sliceString(InputBuffer, command, 0, 5);
-    Print(L"Command: %s \n", command);
+    Print(L"Command: %s.\n", command);
     if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - 5);
       Print(L"\n");
