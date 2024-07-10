@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.4"
+#define VERSION L"0.1.5.5"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -68,7 +68,6 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   Print(L"\n\nEnter \"exit\" to exit or \"help\" for help.\n");
 
   while (1) {
-    ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
     Print(L"Shell> ");
     InputIndex = 0;
 
@@ -96,7 +95,9 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     sliceString(InputBuffer, command, 0, cmdLength);
     
     // Please sort alphabetically!
-    if (StrCmp(command, L"echo") == 0) {
+    if (StrCmp(command, L"clear") == 0) {
+      SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
+    } else if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - cmdLength);
       Print(L"\n");
     } else if (StrCmp(command, L"exit") == 0) {
@@ -120,13 +121,13 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"help")==0) {
       // Please sort alphabetically!
       Print(L"Available commands:\n\n");
+      Print(L"- CLEAR:    Clear screen.\n");
       Print(L"- ECHO:     Output a string.\n");
       Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
-      Print(L"- REBOOT: Shut down computer.\n");
+      Print(L"- REBOOT:   Shut down computer.\n");
       Print(L"- SYSINFO:  Show system information.\n");
       Print(L"- TIME:     Show current time.\n");
     } else if (StrCmp(InputBuffer, L"") == 0) {
-      continue;
     }
     else {
       Print(L"\nCommand not found.\n");
