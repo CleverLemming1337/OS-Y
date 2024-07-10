@@ -35,7 +35,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
           Print(L"\b \b");
         } else if (Key.UnicodeChar >= 32 && Key.UnicodeChar <= 126) {
           InputBuffer[InputIndex++] = Key.UnicodeChar;
-          Print(L"\b%c_", Key.UnicodeChar);
+          Print(L"%c", Key.UnicodeChar);
         } else if (Key.UnicodeChar == 3) { // ^C
           Print(L"^C\n");
           return EFI_SUCCESS;
