@@ -20,6 +20,23 @@ void echo_cmd(CHAR16* str, int n) {
   }
 }
 
+void counter_cmd(CHAR16* arg) {
+  static int counter;
+
+  if (*arg == L'+') {
+    Print(L"Counter is set from %d to %d.", counter, ++counter);
+  }
+  else if (*arg == L'-') {
+    Print(L"Counter is set from %d to %d.", counter, --counter);
+  }
+  else if (*arg == L'0') {
+    Print(L"Counter is set from %d to 0.", counter);
+  }
+  else {
+    Print(L"\aUnknown option.");
+  }
+}
+
 int splitArgs(CHAR16* input, int n) {
   /*
   Splits the command and the args.
@@ -60,7 +77,8 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   int InputIndex = 0;
 
   int cmdLength;
-  CHAR16 command[64];
+  CHAR16 command[32];
+  CHAR16 args[128];
 
   Print(L"Hello, world!\n");
   Print(L"Version: ");
@@ -93,10 +111,13 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
 
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
     sliceString(InputBuffer, command, 0, cmdLength);
-    
+    sliceString(InputBuffer, args, cmdLength+1, StrLen(InputBuffer));
+
     // Please sort alphabetically!
     if (StrCmp(command, L"clear") == 0) {
       SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
+    } else if (StrCmp(command, L"counter") == 0) {
+      counter_cmd(args);
     } else if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - cmdLength);
       Print(L"\n");
@@ -121,6 +142,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"help")==0) {
       // Please sort alphabetically!
       Print(L"Available commands:\n\n");
+      Print(L"- COUNTER:  Count up/down with +/- and reset with 0.\n");
       Print(L"- CLEAR:    Clear screen.\n");
       Print(L"- ECHO:     Output a string.\n");
       Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
