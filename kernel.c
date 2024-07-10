@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.1"
+#define VERSION L"0.1.5.2"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -15,7 +15,7 @@ void echo_cmd(CHAR16* str, int n) {
  Print(L"str: %c", *str);
  Print(L"n: %d\n", n);
 
-  for(int i = 0; i < n; str++) {
+  for(int i = 0; i < n; i++, str++) {
     Print(L"%c", *str);
   }
 }
@@ -93,7 +93,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
 
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
     sliceString(InputBuffer, command, 0, cmdLength);
-    Print(L"Command: %s.\n", command);
+    
     if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - cmdLength);
       Print(L"\n");
