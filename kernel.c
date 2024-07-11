@@ -46,9 +46,9 @@ void keyscan_cmd(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   while(1) {
     Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
     if (Status == EFI_SUCCESS) {
-      Print(L"You pressed %c (Unicode: %d).\n", Key.UnicodeChar, Key.UnicodeChar);
+      Print(L"You pressed %c (Unicode: %d, ScanCode: %d).\n", Key.UnicodeChar, Key.UnicodeChar, Key.ScanCode);
 
-      if (Key.ScanCode == 3) { // ^C
+      if (Key.UnicodeChar == 3) { // ^C
         return;
       }
     }
@@ -167,6 +167,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       Print(L"- CLEAR:    Clear screen.\n");
       Print(L"- ECHO:     Output a string.\n");
       Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
+      Print(L"- KEYSCAN:  Press keys and get their unicode- and scan codes.\n");
       Print(L"- REBOOT:   Shut down computer.\n");
       Print(L"- SYSINFO:  Show system information.\n");
       Print(L"- TIME:     Show current time.\n");
