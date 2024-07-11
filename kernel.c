@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.5"
+#define VERSION L"0.1.6"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
