@@ -24,16 +24,18 @@ void counter_cmd(CHAR16* arg) {
   static int counter;
 
   if (*arg == L'+') {
-    Print(L"Counter is set from %d to %d.", counter, ++counter);
+    Print(L"Counter is set from %d ", counter);
+    Print(L"to %d.\n", ++counter);
   }
   else if (*arg == L'-') {
-    Print(L"Counter is set from %d to %d.", counter, --counter);
+    Print(L"Counter is set from %d ", counter);
+    Print(L"to %d.\n", --counter);
   }
   else if (*arg == L'0') {
-    Print(L"Counter is set from %d to 0.", counter);
+    Print(L"Counter is set from %d to 0.\n", counter);
   }
   else {
-    Print(L"\aUnknown option.");
+    Print(L"The counter is currently at %d.\n", counter);
   }
 }
 
