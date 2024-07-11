@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.6"
+#define VERSION L"0.1.7"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -144,6 +144,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       break;
     } else if (StrCmp(command, L"keyscan") == 0) {
       Print(L"Entering keyscan mode. Exit with ^C.\n");
+      keyscan_cmd(ImageHandle, SystemTable);
     } else if (StrCmp(command, L"reboot")==0) {
       Print(L"Shutting down...\n");
       SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
