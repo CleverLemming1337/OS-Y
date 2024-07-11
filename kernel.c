@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.5.5"
+#define VERSION L"0.1.7"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -12,11 +12,43 @@ void echo_cmd(CHAR16* str, int n) {
   * n: int:       The length of the string
   */
 
- Print(L"str: %c", *str);
- Print(L"n: %d\n", n);
-
   for(int i = 0; i < n; i++, str++) {
     Print(L"%c", *str);
+  }
+}
+
+void counter_cmd(CHAR16* arg) {
+  static int counter;
+
+  if (*arg == L'+') {
+    Print(L"Counter is set from %d ", counter);
+    Print(L"to %d.\n", ++counter);
+  }
+  else if (*arg == L'-') {
+    Print(L"Counter is set from %d ", counter);
+    Print(L"to %d.\n", --counter);
+  }
+  else if (*arg == L'0') {
+    Print(L"Counter is set from %d to 0.\n", counter);
+  }
+  else {
+    Print(L"The counter is currently at %d.\n", counter);
+  }
+}
+
+void keyscan_cmd(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
+  EFI_INPUT_KEY Key;
+  EFI_STATUS Status;
+
+  while(1) {
+    Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
+    if (Status == EFI_SUCCESS) {
+      Print(L"You pressed %c (Unicode: %d, ScanCode: %d).\n", Key.UnicodeChar, Key.UnicodeChar, Key.ScanCode);
+
+      if (Key.UnicodeChar == 3) { // ^C
+        return;
+      }
+    }
   }
 }
 
@@ -54,13 +86,49 @@ void sliceString(CHAR16 *source, CHAR16 *dest, int start, int end) {
 
 EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   InitializeLib(ImageHandle, SystemTable);
-  EFI_INPUT_KEY Key;
+  
   EFI_STATUS Status;
+
+  EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
+  EFI_HANDLE DriverHandle = NULL;
+
+  Status = gBS->HandleProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID**)&LoadedImage);
+  if (EFI_ERROR(Status)) {
+    Print(L"Failed to get LoadedImage protocol: %r\n", Status);
+    return Status;
+  }
+
+  DevicePath = FileDevicePath(LoadedImage->DeviceHandle, L"\\EFI\\BOOT\\ApfsDriverLoader.efi");
+  if (DevicePath == NULL) {
+    Print(L"Failed to create device path for ApfsDriverLoader.efi\n");
+    return EFI_NOT_FOUND;
+  }
+
+  Status = gBS->LoadImage(FALSE, ImageHandle, DevicePath, NULL, 0, &DriverHandle);
+  if (EFI_ERROR(Status)) {
+    Print(L"Failed to load ApfsDriverLoader.efi: %r\n", Status);
+    return Status;
+  }
+
+  Status = gBS->StartImage(DriverHandle, NULL, NULL);
+  if (EFI_ERROR(Status)) {
+    Print(L"Failed to start ApfsDriverLoader.efi: %r\n", Status);
+    return Status;
+  }
+
+  Print(L"ApfsDriverLoader.efi loaded successfully.\n");
+
+
+
+  EFI_INPUT_KEY Key;
+  
   CHAR16 InputBuffer[100];
   int InputIndex = 0;
 
   int cmdLength;
-  CHAR16 command[64];
+  CHAR16 command[32];
+  CHAR16 args[128];
 
   Print(L"Hello, world!\n");
   Print(L"Version: ");
@@ -93,16 +161,22 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
 
     cmdLength = splitArgs(InputBuffer, StrLen(InputBuffer));
     sliceString(InputBuffer, command, 0, cmdLength);
-    
+    sliceString(InputBuffer, args, cmdLength+1, StrLen(InputBuffer));
+
     // Please sort alphabetically!
     if (StrCmp(command, L"clear") == 0) {
       SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
+    } else if (StrCmp(command, L"counter") == 0) {
+      counter_cmd(args);
     } else if (StrCmp(command, L"echo") == 0) {
       echo_cmd(InputBuffer + cmdLength+1, InputIndex - cmdLength);
       Print(L"\n");
     } else if (StrCmp(command, L"exit") == 0) {
       Print(L"Exiting...\n");
       break;
+    } else if (StrCmp(command, L"keyscan") == 0) {
+      Print(L"Entering keyscan mode. Exit with ^C.\n");
+      keyscan_cmd(ImageHandle, SystemTable);
     } else if (StrCmp(command, L"reboot")==0) {
       Print(L"Shutting down...\n");
       SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
@@ -121,9 +195,11 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"help")==0) {
       // Please sort alphabetically!
       Print(L"Available commands:\n\n");
+      Print(L"- COUNTER:  Count up/down with +/- and reset with 0.\n");
       Print(L"- CLEAR:    Clear screen.\n");
       Print(L"- ECHO:     Output a string.\n");
       Print(L"- EXIT:     Exit terminal (return to boot picker.\n");
+      Print(L"- KEYSCAN:  Press keys and get their unicode- and scan codes.\n");
       Print(L"- REBOOT:   Shut down computer.\n");
       Print(L"- SYSINFO:  Show system information.\n");
       Print(L"- TIME:     Show current time.\n");
