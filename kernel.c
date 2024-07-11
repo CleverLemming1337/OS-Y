@@ -39,6 +39,22 @@ void counter_cmd(CHAR16* arg) {
   }
 }
 
+void keyscan_cmd(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
+  EFI_INPUT_KEY Key;
+  EFI_STATUS Status;
+
+  while(1) {
+    Status = uefi_call_wrapper(SystemTable->ConIn->ReadKeyStroke, 2, SystemTable->ConIn, &Key);
+    if (Status == EFI_SUCCESS) {
+      Print(L"You pressed %c (Unicode: %d).\n", Key.UnicodeChar, Key.UnicodeChar);
+
+      if (Key.ScanCode == 3) { // ^C
+        return;
+      }
+    }
+  }
+}
+
 int splitArgs(CHAR16* input, int n) {
   /*
   Splits the command and the args.
@@ -126,6 +142,8 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
     } else if (StrCmp(command, L"exit") == 0) {
       Print(L"Exiting...\n");
       break;
+    } else if (StrCmp(command, L"keyscan") == 0) {
+      Print(L"Entering keyscan mode. Exit with ^C.\n");
     } else if (StrCmp(command, L"reboot")==0) {
       Print(L"Shutting down...\n");
       SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
