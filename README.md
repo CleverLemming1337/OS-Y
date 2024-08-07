@@ -11,7 +11,7 @@ This is a small self-built operating system using an EFI kernel in C.
 > You may need to disable secure boot.
 
 > [!NOTE]
-> Screen output is currently not supported for OpenCore although keyboard input is working.
+> Screen output is currently not supported for OpenCore (Mac devices) although keyboard input is working.
 
 ## Acknowledgements
 - Thanks to [OSDev Wiki](https://wiki.osdev.org) for providing helpful guides and tutorials.
