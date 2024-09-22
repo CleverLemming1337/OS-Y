@@ -46,7 +46,6 @@ EFI_STATUS ReadFile(EFI_FILE_PROTOCOL* Root, CHAR16* FilePath) {
     Status = uefi_call_wrapper(Root->Open, 5, Root, &File, FilePath, EFI_FILE_MODE_READ, 0);
     if (EFI_ERROR(Status)) {
         Print(L"Failed to open file %s: %r\n", FilePath, Status);
-        return Status;
     }
 
     // Read the contents of the file
@@ -54,7 +53,6 @@ EFI_STATUS ReadFile(EFI_FILE_PROTOCOL* Root, CHAR16* FilePath) {
     if (EFI_ERROR(Status)) {
         Print(L"Failed to read file: %r\n", Status);
         File->Close(File);
-        return Status;
     }
 
     // Null-terminate the buffer and print the file contents
@@ -64,11 +62,16 @@ EFI_STATUS ReadFile(EFI_FILE_PROTOCOL* Root, CHAR16* FilePath) {
     // Close the file
     uefi_call_wrapper(File->Close, 1, File);
 
-    return EFI_SUCCESS;
 }
 
 // Main entry point for the UEFI application
 EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
+    Print(L"Press any key...");
+    
+    EFI_INPUT_KEY Key;
+    SystemTable->ConIn->Reset(SystemTable->ConIn, FALSE);
+    SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &Key);
+
     // Initialize the library (sets up SystemTable and other globals)
     InitializeLib(ImageHandle, SystemTable);
 
