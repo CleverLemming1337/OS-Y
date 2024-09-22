@@ -72,5 +72,4 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
     SystemTable->ConIn->Reset(SystemTable->ConIn, FALSE);
     SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &Key);
     
-    return EFI_SUCCESS;
 }
