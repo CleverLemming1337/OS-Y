@@ -77,7 +77,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
     // Open the root directory of the EFI partition
     EFI_FILE_PROTOCOL* Root = OpenRoot(ImageHandle);
     if (Root == NULL) {
-        return EFI_LOAD_ERROR;
+        Print(L"Error opening root.");
     }
 
     // Path to the file you want to read (must be on the EFI partition)

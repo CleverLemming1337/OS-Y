@@ -1,1 +1,1 @@
-If you can see this, reading from fs works!
+It works!
