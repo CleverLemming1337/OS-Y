@@ -11,4 +11,3 @@ cp main.efi EFI_IMG/EFI/BOOT/BOOTx64.efi
 
 cp icon.icns EFI_IMG/.VolumeIcon.icns
 
-cp -r OC/ EFI_IMG/EFI
