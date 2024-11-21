@@ -1,10 +1,12 @@
 isodir/
-*.o
+kernel.o
+main.o
 *.bin
 *.isodir
 main.efi
-*.so
+main.so
 *.key
 *.pem
-signed.efi
+unsigned.efi
 *.DS_Store
+EFI_IMG/

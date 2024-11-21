@@ -98,6 +98,8 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   CHAR16 command[32];
   CHAR16 args[128];
 
+  DEBUG((DEBUG_INFO, "Hello, world!\n"));
+  gST->ConOut->OutputString (gST->ConOut, L"Hello, world!\n");
   Print(L"Hello, world!\n");
   Print(L"Version: ");
   Print(VERSION);
