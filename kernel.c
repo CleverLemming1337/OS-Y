@@ -1,6 +1,6 @@
 #include <efi.h>
 #include <efilib.h>
-#define VERSION L"0.1.7"
+#define VERSION L"0.1.8"
 
 void echo_cmd(CHAR16* str, int n) {
   /*
@@ -97,9 +97,7 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
   int cmdLength;
   CHAR16 command[32];
   CHAR16 args[128];
-
-  DEBUG((DEBUG_INFO, "Hello, world!\n"));
-  gST->ConOut->OutputString (gST->ConOut, L"Hello, world!\n");
+  
   Print(L"Hello, world!\n");
   Print(L"Version: ");
   Print(VERSION);
@@ -152,13 +150,8 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
     } else if (StrCmp(command, L"sysinfo") == 0) {
       Print(L"System Information:\n");
+      Print(L"Version: %s", VERSION);
       Print(L"EFI Specification Version: %d.%d\n", EFI_SPECIFICATION_MAJOR_REVISION, EFI_SPECIFICATION_MINOR_REVISION);
-    } else if (StrCmp(command, L"time") == 0) {
-      // Get current time (a custom implementation)
-      EFI_TIME currentTime;
-      SystemTable->RuntimeServices->GetTime(&currentTime, NULL);
-
-      Print(L"Current time: %02d:%02d:%02d\n", currentTime.Hour, currentTime.Minute, currentTime.Second);
     } else if (StrCmp(command, L"color a") == 0) {
       // Set text color to green
       ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGREEN | EFI_BACKGROUND_BLACK);
@@ -172,7 +165,6 @@ EFI_STATUS EFIAPI efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTabl
       Print(L"- KEYSCAN:  Press keys and get their unicode- and scan codes.\n");
       Print(L"- REBOOT:   Shut down computer.\n");
       Print(L"- SYSINFO:  Show system information.\n");
-      Print(L"- TIME:     Show current time.\n");
     } else if (StrCmp(InputBuffer, L"") == 0) {
     }
     else {

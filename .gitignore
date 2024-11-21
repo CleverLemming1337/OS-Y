@@ -9,4 +9,5 @@ main.so
 *.pem
 unsigned.efi
 *.DS_Store
-EFI_IMG/
+
+EFI_IMG/*
