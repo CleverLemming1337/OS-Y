@@ -7,7 +7,7 @@ mkdir EFI_IMG
 mkdir EFI_IMG/EFI
 mkdir EFI_IMG/EFI/BOOT
 
-cp main.efi EFI_IMG/EFI/BOOT/BOOTx64.efi
+cp build/main.efi EFI_IMG/EFI/BOOT/BOOTx64.efi
 
 cp Icons/OS-Y.icns EFI_IMG/.VolumeIcon.icns
 

@@ -10,4 +10,5 @@ main.so
 unsigned.efi
 *.DS_Store
 
-EFI_IMG/*
+EFI_IMG/
+build/

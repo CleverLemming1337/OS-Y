@@ -1,0 +1,3 @@
+EFI_STATUS
+EFIAPI
+ListFilesInRoot(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable);
