@@ -17,44 +17,43 @@ ListFilesInRoot(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     EFI_HANDLE *HandleBuffer;
     UINTN HandleCount;
     
-    // Suchen nach Block-IO-Handles
+    // Search for Block IO handles
     Status = gBS->LocateHandleBuffer(ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
     if (EFI_ERROR(Status)) {
-        Print(L"Fehler beim Finden von Block-Handles: %r\n", Status);
+        Print(L"Error finding block handles: %r\n", Status);
         return Status;
     }
 
-    // Block-Handles durchgehen und das SimpleFileSystem-Protokoll suchen
+    // Search SimpleFileSystem protocol in block handles
     SimpleFileSystem = NULL;
     for (UINTN i = 0; i < HandleCount; i++) {
         EFI_BLOCK_IO_PROTOCOL *BlockIo;
         
-        // Block-IO-Protokoll auf dem aktuellen Handle öffnen
+        // Open block-IO protocol on handle
         Status = gBS->HandleProtocol(HandleBuffer[i], &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
         if (EFI_ERROR(Status)) {
-            continue; // Wenn Block-IO-Protokoll nicht verfügbar, zum nächsten Handle
+            continue; // Block IO not available, try next handle
         }
 
-        // Überprüfen, ob das SimpleFileSystem-Protokoll auf diesem Block-IO-Handle verfügbar ist
+        // Check if SimpleFileSystem protocol is available
         Status = gBS->HandleProtocol(HandleBuffer[i], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&SimpleFileSystem);
         if (!EFI_ERROR(Status)) {
-            // SimpleFileSystem gefunden, breche die Schleife ab
+            // SimpleFileSystem found, break loop
             break;
         }
     }
 
-    // HandleBuffer freigeben
     FreePool(HandleBuffer);
 
     if (SimpleFileSystem == NULL) {
-        Print(L"Kein Simple File System Protokoll gefunden.\n");
+        Print(L"No filesystem found.\n");
         return EFI_NOT_FOUND;
     }
 
-    // Öffne das Root-Verzeichnis
+    // Open root directory
     Status = SimpleFileSystem->OpenVolume(SimpleFileSystem, &RootDir);
     if (EFI_ERROR(Status)) {
-        Print(L"Fehler beim Öffnen des Root-Verzeichnisses: %r\n", Status);
+        Print(L"Error opening root directory: %r\n", Status);
         return Status;
     }
 
@@ -62,25 +61,24 @@ ListFilesInRoot(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     BufferSize = sizeof(EFI_FILE_INFO) + 1024;
     FileInfo = AllocateZeroPool(BufferSize);
     if (FileInfo == NULL) {
-        Print(L"Speicherfehler: %r\n", Status);
+        Print(L"Storage error: %r\n", Status);
         return EFI_OUT_OF_RESOURCES;
     }
 
-    // Alle Dateien im Root-Verzeichnis lesen
+    // Read all files
     Status = RootDir->Read(RootDir, &BufferSize, FileInfo);
     while (Status == EFI_SUCCESS) {
-        if (FileInfo->FileName[0] != L'.') { // "." und ".." überspringen
-            Print(L"Gefundene Datei: %s\n", FileInfo->FileName);
+        if (FileInfo->FileName[0] != L'.') { // Skip ., .. and hidden files
+            Print(L"%s\n", FileInfo->FileName);
         }
 
         Status = RootDir->Read(RootDir, &BufferSize, FileInfo);
     }
 
     if (Status != EFI_END_OF_FILE) {
-        Print(L"Fehler beim Auflisten der Dateien: %r\n", Status);
+        Print(L"Error listing files: %r\n", Status);
     }
 
-    // Speicher freigeben
     FreePool(FileInfo);
 
     return EFI_SUCCESS;
