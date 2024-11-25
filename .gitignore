@@ -1,14 +1,3 @@
-isodir/
-kernel.o
-main.o
-*.bin
-*.isodir
-main.efi
-main.so
-*.key
-*.pem
-unsigned.efi
-*.DS_Store
-
-EFI_IMG/
-build/
+BOOTx64.efi
+DSKIMG.INF
+*.iso

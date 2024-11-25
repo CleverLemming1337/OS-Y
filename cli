@@ -1,0 +1,41 @@
+#!/bin/bash
+case $1 in
+    setup)
+        git submodule update --init || exit 1
+        sudo apt install clang lld qemu-system-x86 || exit 1
+        ;;
+    build)
+        clang efi.c \
+            -target x86_64-unknown-windows \
+            -std=c17 \
+            -Wall \
+            -Wextra \
+            -Wpedantic \
+            -mno-red-zone \
+            -ffreestanding \
+            -nostdlib \
+            -fuse-ld=lld-link \
+            -Wl,-subsystem:efi_application \
+            -Wl,-entry:efi_main \
+            -o BOOTx64.efi || exit 1
+        UEFI-GPT-image-creator/write_gpt -i image.iso -ae /EFI/BOOT/ BOOTx64.efi
+        ;;
+    qemu)
+        $0 build || exit 1
+        qemu-system-x86_64 \
+            -drive format=raw,file=image.iso \
+            -bios bios64.bin \
+            -m 256M \
+            -vga std \
+            -name OS-Y \
+            -machine q35 \
+            -usb \
+            -device usb-mouse \
+            -rtc base=localtime \
+            -net none
+        ;;
+    *)
+        echo "Invalid command: $1"
+        exit 1
+        ;;
+esac

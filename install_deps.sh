@@ -1,3 +1,2 @@
 #!/bin/bash
-
-sudo apt install gcc
+sudo apt install clang lld genisoimage
